@@ -20,7 +20,12 @@ Why this one wins the judge's brief, in the brief's own order:
      self-checkout joke — the dignity-bagging turn is not one anyone
      has heard from a till.
 
-Finalists beaten by it, and why:
+Revision pass (second message): the draft line survived re-reading
+against the brief unchanged — the bagging twist is the strongest
+sting and the freshest turn of the five finalists. Two corrections
+from verification: the line measures 80 characters, not 84 as first
+written, and validate() now also rejects leading/trailing whitespace
+so no invisible padding reaches the judge.
   * "Twelve yoghurts and nothing else. I have scanned your basket,
     your fridge, and your future. All empty." — strong escalating
     triplet, but the laugh arrives a beat slower and "scanned your
@@ -49,13 +54,21 @@ MAX_CHARS = 200
 
 
 def validate(entry: str) -> str:
-    """Enforce the gate: UTF-8 text of 1-200 characters, not only whitespace."""
+    """Enforce the gate: UTF-8 text of 1-200 characters, not only whitespace.
+
+    Revision pass: also reject leading/trailing whitespace. The gate
+    only forbids an all-whitespace entry, but a stray space at either
+    end would be dead weight on a line the brief wants tight, and a
+    trailing space is invisible padding the judge reads as sloppiness.
+    """
     if not isinstance(entry, str):
         raise TypeError("entry must be text")
     if not (1 <= len(entry) <= MAX_CHARS):
         raise ValueError(f"entry must be 1-{MAX_CHARS} characters, got {len(entry)}")
     if not entry.strip():
         raise ValueError("entry must not be only whitespace")
+    if entry != entry.strip():
+        raise ValueError("entry must not have leading or trailing whitespace")
     if "\n" in entry or "\r" in entry:
         raise ValueError("entry must be a single line")
     if any(ord(ch) < 0x20 for ch in entry):
